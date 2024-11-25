@@ -1,12 +1,16 @@
 export class HttpError extends Error {
-    constructor(status, message) {
-        super(message)
-        this.status = status
-    }
+  constructor(status, message) {
+    super(message)
+    this.status = status
+  }
 }
 
 const createHttpError = (status) => (message) => {
-    return new HttpError(status, message)
+  return new HttpError(status, message)
+}
+
+export const isHttpError = (error) => {
+  return error instanceof HttpError
 }
 
 export const badRequestError = createHttpError(400)
@@ -20,15 +24,3 @@ export const notFoundError = createHttpError(404)
 export const conflictError = createHttpError(409)
 
 export const internalServerError = createHttpError(500)
-
-
-
-
-
-
-const isHttpError = (error) => {
-    return error instanceof HttpError
-}
-
-
-

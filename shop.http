@@ -5,16 +5,18 @@ Get http://localhost:3000/v1/api/test
 Get http://localhost:3000/v1/api/users
 
 ###
-Get http://localhost:3000/v1/api/users/1
+Get http://localhost:3000/v1/api/users/2q
+
 
 ###
 Post http://localhost:3000/v1/api/user
 content-type: application/json
 
 {
-    "name": "test2",
-    "age": 30,
-    "email": "test2@test.com"
+    "name": "jan",
+    "age": 20,
+    "email": "test@test3.com",
+    "password": "test1234"
 }
 
 
@@ -23,5 +25,5 @@ Put http://localhost:3000/v1/api/users/1
 content-type: application/json
 
 {
-    "age": 33
+    
 }
