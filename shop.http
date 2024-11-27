@@ -5,7 +5,7 @@ Get http://localhost:3000/v1/api/test
 Get http://localhost:3000/v1/api/users
 
 ###
-Get http://localhost:3000/v1/api/users/2q
+Get http://localhost:3000/v1/api/users/1
 
 
 ###
@@ -13,10 +13,9 @@ Post http://localhost:3000/v1/api/user
 content-type: application/json
 
 {
-    "name": "jan",
+    "name": "janchow",
     "age": 20,
-    "email": "test@test3.com",
-    "password": "test1234"
+    "email": "test@test4.com",
 }
 
 
@@ -25,5 +24,26 @@ Put http://localhost:3000/v1/api/users/1
 content-type: application/json
 
 {
-    
+    "age": 30
+}
+
+###
+Delete http://localhost:3000/v1/api/users/2
+
+
+###
+Get http://localhost:3000/v1/api/products
+
+###
+Get http://localhost:3000/v1/api/products/1
+
+
+###
+Post http://localhost:3000/v1/api/product
+content-type: application/json
+
+{
+    "name": "蒸排骨",
+    "price": 20,
+    "description": "好吃排骨"
 }

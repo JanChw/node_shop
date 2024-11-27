@@ -4,6 +4,8 @@ import compression from 'compression'
 import router from './routes/index.js'
 import { notFoundHandler, errorHandler } from './middlewares/errorHandler.js'
 
+
+
 const API_VERSION = process.env.API_VERSION
 const app = express()
 

@@ -7,8 +7,8 @@ export const validateReq =
 
     if (error) throw badRequestError(error)
 
-    console.log(data)
     req.validatedData = data
 
     next()
   }
+

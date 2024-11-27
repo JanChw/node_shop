@@ -17,6 +17,7 @@
     "drizzle-orm": "^0.36.4",
     "express": "^5.0.1",
     "helmet": "^8.0.0",
+    "meilisearch": "^0.45.0",
     "pino": "^9.5.0",
     "pino-pretty": "^13.0.0",
     "zod": "^3.23.8"

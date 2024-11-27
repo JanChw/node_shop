@@ -13,7 +13,7 @@ export const isEmptyObject = (obj) => {
   return obj !== null && obj !== void 0 && Object.keys(obj).length === 0
 }
 
-// todo
+// TODO: validateParams validateQuery validateBody
 export const validate = async (schema, req, attrs, path) => {
   if (isEmptyObject(req[path])) return [badRequestError('数据不能为空'), null]
 
