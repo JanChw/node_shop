@@ -19,4 +19,6 @@ export const errorHandler = (err, req, res, next) => {
     message: '服务器错误',
     data: null,
   })
+
+  console.log(res.statusCode)
 }

@@ -32,10 +32,10 @@ Delete http://localhost:3000/v1/api/users/2
 
 
 ###
-Get http://localhost:3000/v1/api/products
+Get http://localhost:3000/v1/api/products?page=1&size=5&sort=id,desc
 
 ###
-Get http://localhost:3000/v1/api/products/1
+Get http://localhost:3000/v1/api/products/2
 
 
 ###

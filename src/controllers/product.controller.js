@@ -4,11 +4,13 @@ import ProductService from "../services/product.service.js"
 export default {
   getProducts: async (req, res) => {
     const products = await ProductService.getEntities()
+    console.log(res.statusCode)
     return res.json(products)
   },
 
   getProductById: async (req, res) => {
     const product = await ProductService.getEntityById(req.params.id)
+    console.log(product)
     return res.json(product)
   },
 // TODO: validateData == validateBodyData

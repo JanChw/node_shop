@@ -1,4 +1,5 @@
 import router from './initRoute.js'
+import { cache } from '../middlewares/cache.js'
 import ProductController from '../controllers/product.controller.js'
 import { validateReq } from '../middlewares/reqValidate.js'
 import {
@@ -8,8 +9,8 @@ import {
 
 
 router
-  .get('/products', ProductController.getProducts)
-  .get('/products/:id',ProductController.getProductById)
+  .get('/products',cache('products'), ProductController.getProducts)
+  .get('/products/:id',cache('product'), ProductController.getProductById)
   .post(
     '/product',
     validateReq(...CreateProductReqValidation),

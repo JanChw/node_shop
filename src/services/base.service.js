@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm'
-import db from '../db/index.js'
+import { sqlite as db } from '../db/index.js'
 
 const createServiceFn = (db) =>(schema) => {
   return new BaseService(db, schema)
