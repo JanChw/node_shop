@@ -1,19 +1,19 @@
 import { eq } from 'drizzle-orm'
 import { sqlite as db } from '../db/index.js'
 
-const createServiceFn = (db) =>(schema) => {
-  return new BaseService(db, schema)
-}
+// const createServiceFn = (db) =>(schema, Class) => {
+//   return new Class(db, schema)
+// }
 
-export default createServiceFn(db)
+// export default createServiceFn(db)
 
-class BaseService {
+export class BaseService {
   constructor(db, schema) {
     ;(this.db = db), (this.schema = schema)
   }
 
   async getEntityById(id) {
-    const entity = await db
+    const entity = await this.db
       .select()
       .from(this.schema)
       .where(eq(this.schema.id, id))
@@ -22,12 +22,12 @@ class BaseService {
   }
 
   async getEntities() {
-    const entities = await db.select().from(this.schema).all()
+    const entities = await this.db.select().from(this.schema).all()
     return entities
   }
 
   async createEntity(entity) {
-    const newEntity = await db
+    const newEntity = await this.db
       .insert(this.schema)
       .values(entity)
       .returning()
@@ -46,7 +46,7 @@ class BaseService {
   }
 
   async deleteEntity(id) {
-    const deletedEntity = await db
+    const deletedEntity = await this.db
       .delete(this.schema)
       .where(eq(this.schema.id, id))
       .returning()

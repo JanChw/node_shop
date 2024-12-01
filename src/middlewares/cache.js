@@ -4,24 +4,16 @@ export const cache = (prefix) => async (req, res, next) => {
   let data = await redis.get(key)
 
   if (data) {
-    return res.json({
-      success: true,
-      message: '获取数据成功',
-      data: JSON.parse(data),
-    })
+    return res.json(JSON.parse(data))
   }
 
   let _json = res.json.bind(res)
   res.json = (data) => {
     const expireDuration = parseInt(process.env.REDIS_EXPIRE_DURATION)
-    if (!data.success) {
+    if (res.statusCode === 200) {
       redis.set(key, JSON.stringify(data), 'EX', expireDuration)
     }
-    _json({
-      success: true,
-      message: '获取数据成功',
-      data,
-    })
+    _json(data)
   }
 
   next()

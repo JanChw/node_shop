@@ -5,7 +5,33 @@ Get http://localhost:3000/v1/api/test
 Get http://localhost:3000/v1/api/users
 
 ###
-Get http://localhost:3000/v1/api/users/1
+Get http://localhost:3000/v1/api/users/7
+
+###
+Post http://localhost:3000/v1/api/auth/login
+content-type: application/json
+
+{
+    "username": "jack",
+    "password": "123456"
+}
+
+###
+Post http://localhost:3000/v1/api/auth/signup
+content-type: application/json
+
+{
+    "name": "janchow",
+    "age": 23,
+    "password": "123456",
+    "email": "1634889315@qq.com"
+}
+
+###
+Get http://localhost:3000/v1/api/auth/verify/email/f5364254-0564-40d6-8936-34243f6050a5
+
+
+
 
 
 ###
@@ -13,9 +39,10 @@ Post http://localhost:3000/v1/api/user
 content-type: application/json
 
 {
-    "name": "janchow",
-    "age": 20,
-    "email": "test@test4.com",
+    "name": "mike",
+    "age": 23,
+    "password": "123456",
+    "email": "mike@test.com"
 }
 
 

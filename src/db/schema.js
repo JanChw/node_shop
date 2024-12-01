@@ -5,6 +5,8 @@ export const usersTable = sqliteTable('users_table', {
   name: text().notNull(),
   age: int().notNull(),
   email: text().notNull().unique(),
+  email_verified: int({ mode: 'boolean' }).notNull().default(0),
+  password: text().notNull(),
 })
 
 export const ProcuctsTable = sqliteTable('products_table', {

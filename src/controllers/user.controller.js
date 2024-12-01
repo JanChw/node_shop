@@ -12,8 +12,12 @@ export default {
   },
 // TODO: validateData == validateBodyData
   createUser: async (req, res) => {
-    const newUser = await UserService.createEntiy(req.validatedData)
-    return res.status(201).json(newUser)
+    const newUser = await UserService.createEntity(req.validatedData)
+    return res.status(201).json({
+      success: true,
+      message: '用户创建成功',
+      data: newUser,
+    })
   },
 
   updateUser: async (req, res) => {
@@ -27,5 +31,15 @@ export default {
   deleteUser: async (req, res) => {
     const deletedUser = await UserService.deleteEntity(req.params.id)
     return res.json(deletedUser)
+  },
+
+  resetPassword: async (req, res) => {
+    // const resetUser = await UserService.resetPassword(req.params.id)
+    // return res.json(resetUser)
+  },
+
+  verifyEmail: async (req, res) => {
+    // const validateUser = await UserService.validateEmail(req.params.id)
+    // return res.json(validateUser)
   },
 }

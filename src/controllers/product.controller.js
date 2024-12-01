@@ -1,19 +1,24 @@
-
-import ProductService from "../services/product.service.js"
+import ProductService from '../services/product.service.js'
 
 export default {
   getProducts: async (req, res) => {
     const products = await ProductService.getEntities()
-    console.log(res.statusCode)
-    return res.json(products)
+    return res.json({
+      success: true,
+      message: '获取数据成功',
+      data: products,
+    })
   },
 
   getProductById: async (req, res) => {
     const product = await ProductService.getEntityById(req.params.id)
-    console.log(product)
-    return res.json(product)
+    return res.json({
+      success: true,
+      message: '获取数据成功',
+      data: product,
+    })
   },
-// TODO: validateData == validateBodyData
+  // TODO: validateData == validateBodyData
   createProduct: async (req, res) => {
     const newProduct = await ProductService.createEntity(req.validatedData)
     return res.status(201).json(newProduct)
@@ -21,8 +26,8 @@ export default {
 
   updateProduct: async (req, res) => {
     const updatedProduct = await ProductService.updateEntity(
-     req.params.id,
-     req.validatedData
+      req.params.id,
+      req.validatedData
     )
     return res.json(updatedProduct)
   },

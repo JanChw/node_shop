@@ -1,7 +1,8 @@
-import getService from './base.service.js'
+import { BaseService } from './base.service.js'
 import { ProcuctsTable } from '../db/schema.js'
+import { sqlite as db } from '../db/index.js'
  
-export default getService(ProcuctsTable)
+export default new BaseService(db, ProcuctsTable)
 
 //TODO:id对应的user是否存在
 // export default {

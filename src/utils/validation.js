@@ -14,6 +14,7 @@ const IDSchema = z.object({
 const CreateUserSchema = z.object({
   name: z.string().min(1, { message: '用户名不能为空' }),
   email: z.string().email({ message: '邮箱格式不正确' }),
+  password: z.string().min(6, { message: '密码长度不能小于6' }),
   age: z
     .number()
     .int()
@@ -66,7 +67,7 @@ export const GetUserReqValidation = [IDSchema, ['id']]
 
 export const CreateUserReqValidation = [
   CreateUserSchema,
-  ['name', 'email', 'age'],
+  ['name', 'email', 'age', 'password'],
 ]
 
 export const UpateUserReqValidation = [
