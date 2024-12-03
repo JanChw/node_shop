@@ -22,7 +22,8 @@ export class MinioStorageEngine {
             logger.error(err)
             logger.error('Failed to create bucket.')
           })
-
+          // 设置桶的访问策略为公共读
+          await setPublicPolicy(this.minioClient, this.bucketName)
           logger.info('Bucket created.')
         }
         logger.info('Bucket exists.')
@@ -31,17 +32,18 @@ export class MinioStorageEngine {
   }
 
   // TODO: 添加文件resize compress等功能
+  // TODO: 非英文文件名会乱码
   _handleFile(req, file, cb) {
-    const fileName = file.originalname
-
-    console.log('file: ', file)
-
-    console.log('fileName: ', fileName)
+    const dir = file.mimetype.split('/').shift()
+    const fileName = `${dir}/${file.originalname}`
 
     this.minioClient.putObject(
       this.bucketName,
       fileName,
       file.stream,
+      {
+        'Content-Type': file.mimetype,
+      },
       (err, etag) => {
         if (err) {
           return cb(err)
@@ -69,3 +71,24 @@ export default new MinioStorageEngine({
   minioClient: mc,
   bucketName: process.env.MINIO_BUCKET_NAME,
 })
+
+async function setPublicPolicy(mc, bucketName) {
+  try {
+    const policy = {
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Effect: 'Allow',
+          Principal: '*',
+          Action: ['s3:GetObject'],
+          Resource: [`arn:aws:s3:::${bucketName}/*`],
+        },
+      ],
+    }
+
+    await mc.setBucketPolicy(bucketName, JSON.stringify(policy))
+    console.log(`Bucket ${bucketName} is now publicly readable.`)
+  } catch (error) {
+    console.error('Error setting bucket policy:', error)
+  }
+}
