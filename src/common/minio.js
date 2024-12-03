@@ -1,3 +1,4 @@
+import { convertToWebp } from '../utils/convert.js'
 import * as Minio from 'minio'
 
 export const mc = new Minio.Client({
@@ -16,9 +17,9 @@ export class MinioStorageEngine {
     // 确保桶存在
     this.minioClient
       .bucketExists(this.bucketName)
-      .then(async (exists) => {
+      .then(async exists => {
         if (!exists) {
-          await this.minioClient.makeBucket(this.bucketName).catch((err) => {
+          await this.minioClient.makeBucket(this.bucketName).catch(err => {
             logger.error(err)
             logger.error('Failed to create bucket.')
           })
@@ -33,37 +34,33 @@ export class MinioStorageEngine {
 
   // TODO: 添加文件resize compress等功能
   // TODO: 非英文文件名会乱码
-  _handleFile(req, file, cb) {
+  async _handleFile(req, file, cb) {
+    const [_fileName, _extName] = file.originalname.split('.')
     const dir = file.mimetype.split('/').shift()
-    const fileName = `${dir}/${file.originalname}`
+    let data = file.stream
+    let fileName = `${dir}/${file.originalname}`
 
-    this.minioClient.putObject(
-      this.bucketName,
-      fileName,
-      file.stream,
-      {
+    if (['image/jpeg', 'image/png'].includes(file.mimetype)) {
+      file.mimetype = 'image/webp'
+      data = await convertToWebp(data)
+      fileName = `${dir}/${_fileName}.webp`
+    }
+
+    const result = await this.minioClient
+      .putObject(this.bucketName, fileName, data, {
         'Content-Type': file.mimetype,
-      },
-      (err, etag) => {
-        if (err) {
-          return cb(err)
-        }
-        cb(null, { path: `${this.bucketName}/${fileName}`, etag })
-      }
-    )
+      })
+      .catch(cb)
+
+    cb(null, { path: `${this.bucketName}/${fileName}`, etag: result.etag })
   }
 
-  _removeFile(req, file, cb) {
-    this.minioClient.removeObject(
-      this.bucketName,
-      file.path.split('/').pop(),
-      (err) => {
-        if (err) {
-          return cb(err)
-        }
-        cb(null)
-      }
-    )
+  async _removeFile(req, file, cb) {
+    await this.minioClient
+      .removeObject(this.bucketName, file.path.split('/').pop())
+      .catch(cb)
+      
+    cb(null)
   }
 }
 
@@ -73,22 +70,20 @@ export default new MinioStorageEngine({
 })
 
 async function setPublicPolicy(mc, bucketName) {
-  try {
-    const policy = {
-      Version: '2012-10-17',
-      Statement: [
-        {
-          Effect: 'Allow',
-          Principal: '*',
-          Action: ['s3:GetObject'],
-          Resource: [`arn:aws:s3:::${bucketName}/*`],
-        },
-      ],
-    }
-
-    await mc.setBucketPolicy(bucketName, JSON.stringify(policy))
-    console.log(`Bucket ${bucketName} is now publicly readable.`)
-  } catch (error) {
-    console.error('Error setting bucket policy:', error)
+  const policy = {
+    Version: '2012-10-17',
+    Statement: [
+      {
+        Effect: 'Allow',
+        Principal: '*',
+        Action: ['s3:GetObject'],
+        Resource: [`arn:aws:s3:::${bucketName}/*`],
+      },
+    ],
   }
+
+  await mc
+    .setBucketPolicy(bucketName, JSON.stringify(policy))
+    .catch(logger.error)
+  logger.info(`Bucket ${bucketName} is now publicly readable.`)
 }
