@@ -1,5 +1,8 @@
 import { convertToWebp } from '../utils/convert.js'
 import * as Minio from 'minio'
+import sharp from 'sharp'
+
+const sizes = ['lg', 'md', 'sm', 'xs', 'thumb']
 
 export const mc = new Minio.Client({
   endPoint: process.env.MINIO_ENDPOINT,
@@ -32,10 +35,10 @@ export class MinioStorageEngine {
       .catch(logger.error)
   }
 
-  // TODO: 添加文件resize compress等功能
+  // TODO: 图片剪裁放到任务队列中处理
   // TODO: 非英文文件名会乱码
   async _handleFile(req, file, cb) {
-    const [_fileName, _extName] = file.originalname.split('.')
+    let [_fileName, _extName] = file.originalname.split('.')
     const dir = file.mimetype.split('/').shift()
     let data = file.stream
     let fileName = `${dir}/${file.originalname}`
@@ -43,23 +46,55 @@ export class MinioStorageEngine {
     if (['image/jpeg', 'image/png'].includes(file.mimetype)) {
       file.mimetype = 'image/webp'
       data = await convertToWebp(data)
-      fileName = `${dir}/${_fileName}.webp`
+      _extName = 'webp'
+      fileName = `${dir}/${_fileName}.${_extName}`
     }
 
-    const result = await this.minioClient
-      .putObject(this.bucketName, fileName, data, {
+    // lg width 1080
+    // md width 768
+    // sm width 540
+    // xs width 360
+    // thumb width 180
+    const pms = [
+      sharp(data).resize(1080).toBuffer(),
+      sharp(data).resize(768).toBuffer(),
+      sharp(data).resize(540).toBuffer(),
+      sharp(data).resize(360).toBuffer(),
+      sharp(data).resize(180).toBuffer(),
+    ]
+    const resizes = await Promise.all(pms)
+
+    let obj = {}
+
+    sizes.forEach((val, index) => {
+      obj[val] = resizes[index]
+    })
+    obj['orgin'] = data
+
+    let objs = Object.entries(obj).map(([key, value]) => {
+      let filePath = `${dir}/${_fileName}.${_extName}`
+      if (key !== 'orgin') {
+        filePath = `${dir}/${_fileName}-${key}.${_extName}`
+      }
+
+      return this.minioClient.putObject(this.bucketName, filePath, value, {
         'Content-Type': file.mimetype,
       })
-      .catch(cb)
+    })
 
-    cb(null, { path: `${this.bucketName}/${fileName}`, etag: result.etag })
+    const result = await Promise.all(objs).catch(cb)
+
+    cb(null, { path: `${this.bucketName}/${fileName}`, etag: result[0].etag })
   }
 
   async _removeFile(req, file, cb) {
-    await this.minioClient
-      .removeObject(this.bucketName, file.path.split('/').pop())
-      .catch(cb)
-      
+    let originalname = file.path.split('/').pop()
+    let removeOriginFile = this.minioClient
+      .removeObject(this.bucketName, originalname)
+    let removes = sizes.map(val => this.minioClient.removeObject(this.bucketName, `${originalname.split('.')[0]}-${val}.${originalname.split('.')[1]}`))  
+
+    await Promise.all([removeOriginFile,...removes]).catch(cb)
+    
     cb(null)
   }
 }
