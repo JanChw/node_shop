@@ -37,15 +37,17 @@ export class MinioStorageEngine {
   async _handleFile(req, file, cb) {
     let [_fileName, _extName] = file.originalname.split('.')
     const dir = file.mimetype.split('/').shift()
+    let extName = _extName
+
     let data = file.stream
 
     if (['image/jpeg', 'image/png'].includes(file.mimetype)) {
       file.mimetype = 'image/webp'
-      _extName = 'webp'
+      extName = 'webp'
       data = await convertToWebp(data)
     }
 
-    let fileName = `${_fileName}.${_extName}`
+    let fileName = `${_fileName}.${extName}`
 
     const filePath = `${dir}/${fileName}`
 
@@ -61,11 +63,16 @@ export class MinioStorageEngine {
       etag: result.etag,
     })
 
-    tasks.add('resize', { path: filePath })
+
+    !['svg', 'icon', 'ico'].includes(_extName) && tasks.add('resize', { path: filePath })
+    
   }
 
   async _removeFile(req, file, cb) {
-    await this.minioClient.removeObject(this.bucketName, file.path).catch(cb)
+    await this.minioClient.removeObject(this.bucketName, file.path).catch((err) => {
+      logger.error(err)
+      cb(err)
+    })
 
     cb(null)
 

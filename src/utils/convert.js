@@ -16,18 +16,18 @@ export const sizes = Object.keys(special)
 export async function convertToWebp (readable) {
   const { data } = await readable.pipe(sharp())
     // .toFormat(Format.webp)
-    .webp({ quality: 75})
+    .webp({ quality: 80})
     .toBuffer({ resolveWithObject: true })
   
     
   return data
 }
 
-export function resize(readable) {
+export function resize(arrayBuffer) {
   return sizes.map(async (val) =>
   {
-    const buffers = await readable.pipe(sharp()).resize(special[val]).toBuffer()  
-    return {special:val,data:buffers}
+    const buffer = await sharp(arrayBuffer).resize(special[val]).toBuffer()  
+    return {special:val,data:buffer}
   }
   )
 }

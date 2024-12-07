@@ -1,9 +1,20 @@
 import { badRequestError } from './error.js'
-export const permit = (obj, attrs) => {
+export const pick = (obj, attrs) => {
   const newObj = {}
   for (const attr of attrs) {
     if (attr in obj) {
       newObj[attr] = obj[attr]
+    }
+  }
+  return newObj
+}
+
+
+export const omit = (obj, attrs) => {
+  const newObj = {} 
+  for (const key in obj) {
+    if (!attrs.includes(key)) {
+      newObj[key] = obj[key]
     }
   }
   return newObj
