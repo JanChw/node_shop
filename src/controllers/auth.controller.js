@@ -1,19 +1,13 @@
 import UserService from '../services/user.service.js'
-import { badRequestError, notFoundError } from '../utils/error.js'
+import { badRequestError } from '../utils/error.js'
 import jwt from 'jsonwebtoken'
 
 
-// TODO: 数据校验
 export async function login(req, res, next) {
-  let { username, password, email } = req.body
-  let _username = username ?? email
-  if (!_username) {
-    return next(notFoundError('用户名或邮箱不能为空'))
-  }
-  if (!password) {
-    return next(notFoundError('密码不能为空'))
-  }
-  let user = await UserService.login(_username, password)
+
+  let { username, password } = req.body
+  
+  let user = await UserService.login(username, password)
 
   const token = await jwt.sign(
     {

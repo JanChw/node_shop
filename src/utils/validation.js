@@ -22,6 +22,13 @@ const CreateUserSchema = z.object({
     .lt(200, { message: '年龄超出实际范围' }),
 })
 
+const LoginSchema = z.object({
+  username: z.string({message: '用户名不能为空' })
+            .email({ message: '邮箱或用户名格式不正确' })
+            .or(z.string().min(3, {message: '用户名不能小于3'})),
+  password: z.string().min(6, { message: '密码长度不能小于6' })
+  })
+
 const UpdateUserSchema = z.object({
   id: z
     .string({ message: '参数不合法' })
@@ -73,6 +80,11 @@ export const CreateUserReqValidation = [
 export const UpateUserReqValidation = [
   UpdateUserSchema,
   ['id', 'name', 'email', 'age'],
+]
+
+export const LoginReqValidation = [
+  LoginSchema,
+  ['username', 'password'],
 ]
 
 export const CreateProductReqValidation = [

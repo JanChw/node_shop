@@ -12,7 +12,7 @@ Post http://localhost:3000/v1/api/auth/login
 content-type: application/json
 
 {
-    "username": "jack",
+    "username": "ja",
     "password": "123456"
 }
 

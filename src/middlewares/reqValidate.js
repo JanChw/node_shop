@@ -1,12 +1,10 @@
 import { validate } from '../utils/index.js'
-import { badRequestError } from '../utils/error.js'
 export const validateReq =
-  (schema, attrs, path = 'body') =>
+  (schema, attrs, pos = 'body') =>
   async (req, res, next) => {
-    const [error, data] = await validate(schema, req, attrs)
+    const data = await validate(schema, req[pos], attrs)
 
-    if (error) throw badRequestError(error)
-
+    //TODO:移除
     req.validatedData = data
 
     next()
